@@ -1,0 +1,8 @@
+.gradle/
+build/
+app/build/
+app/release.jks
+local.properties
+*.iml
+.idea/
+icon-512.png

@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FBF4EE">
+<title>CREMOSA</title>
+<style>
+/*FONTS*/
+/*LEAFLET_CSS*/
+:root{
+  --bg:#FBF4EE; --card:#FFFFFF; --soft:#F1E2D8; --ink:#2A1A22; --muted:#6B5A62;
+  --line:#EADBD2; --chip:#CDB8C3; --plum:#7A2E62; --plum-d:#5A1F48; --gold:#D98E3F;
+  --green:#2E7D52; --warn-bg:#FCE6CF; --warn:#8A4A0B;
+  --nav-h:68px; --top-h:58px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:'DM Sans',system-ui,sans-serif;font-size:15px}
+body{overscroll-behavior:none}
+button,input,select{font:inherit;color:inherit}
+h1,h2,h3{font-family:'Outfit','DM Sans',sans-serif;margin:0}
+.num{font-variant-numeric:tabular-nums}
+#ver{position:fixed;top:calc(env(safe-area-inset-top) + 6px);right:10px;z-index:50;font-size:11px;font-weight:700;color:var(--muted);background:rgba(251,244,238,.9);padding:2px 6px;border-radius:6px}
+header.top{position:fixed;top:0;left:0;right:0;height:calc(var(--top-h) + env(safe-area-inset-top));padding:calc(env(safe-area-inset-top) + 14px) 18px 0;background:var(--bg);z-index:20}
+.logo{font-family:'Outfit',sans-serif;font-weight:800;font-size:24px;letter-spacing:2px;color:var(--plum)}
+main{position:absolute;top:calc(var(--top-h) + env(safe-area-inset-top));bottom:calc(var(--nav-h) + env(safe-area-inset-bottom));left:0;right:0;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.page{display:none;padding:6px 18px 24px;max-width:560px;margin:0 auto}
+.page.on{display:block}
+.title{font-size:22px;font-weight:800;margin:4px 0 2px}
+.sub{color:var(--muted);font-size:14px;margin:0 0 14px}
+.card{background:var(--card);border-radius:18px;padding:14px;box-shadow:0 2px 10px rgba(42,26,34,.07)}
+.stack{display:flex;flex-direction:column;gap:12px}
+.row{display:flex;gap:10px;align-items:center}
+.grow{flex:1;min-width:0}
+.btn{border:0;border-radius:14px;min-height:48px;padding:0 18px;font-weight:700;font-size:15px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+.btn.pri{background:var(--plum);color:#fff}
+.btn.dark{background:var(--ink);color:#fff}
+.btn.out{background:transparent;border:1.5px solid var(--plum);color:var(--plum)}
+.btn.full{width:100%}
+.btn.sm{min-height:40px;font-size:14px;padding:0 12px;border-radius:12px}
+.btn:active{transform:scale(.98)}
+.btn[disabled]{opacity:.45}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px solid var(--chip);background:transparent;border-radius:999px;padding:0 14px;min-height:40px;font-size:14px;cursor:pointer}
+.chip.on{background:var(--plum);border-color:var(--plum);color:#fff;font-weight:500}
+.photo{background:var(--soft);border-radius:20px;height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;overflow:hidden;position:relative}
+.photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.photo .again{position:absolute;right:10px;bottom:10px}
+.lbl{font-family:'Outfit',sans-serif;font-weight:700;font-size:17px;margin:4px 0 0}
+.rec{display:flex;gap:12px;align-items:flex-start}
+.tube{flex:none;width:48px;height:64px;border-radius:10px 10px 16px 16px}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:4px 8px;border-radius:8px;letter-spacing:.3px}
+.tag.uso{background:#EFE7EC;color:var(--plum-d)}
+.tag.venda{background:var(--warn-bg);color:var(--warn)}
+.tag.troca{background:#E1EEF6;color:#245B80}
+.tag.best{background:var(--green);color:#fff}
+.small{font-size:13px;color:var(--muted)}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.item{background:var(--card);border-radius:18px;padding:10px;display:flex;flex-direction:column;gap:5px;cursor:pointer;border:0;text-align:left}
+.item .ph{height:110px;border-radius:12px;background:var(--soft);overflow:hidden;display:flex;align-items:center;justify-content:center}
+.item .ph img{width:100%;height:100%;object-fit:cover}
+.item .nm{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.filters{display:flex;gap:8px;margin-bottom:12px}
+.empty{text-align:center;color:var(--muted);padding:30px 10px}
+.banner{background:var(--warn-bg);color:var(--warn);border-radius:12px;padding:10px 12px;font-size:13px;font-weight:500}
+#map{height:230px;border-radius:18px;overflow:hidden;background:#E4EDE6;z-index:1}
+.shop{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.shop:last-child{border-bottom:0}
+.price{font-weight:700;font-size:16px;min-width:92px;text-align:right}
+.pr{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:14px;padding:10px 12px;border:2px solid transparent}
+.pr.best{border-color:var(--green)}
+.x{border:0;background:transparent;width:40px;height:40px;border-radius:10px;color:var(--muted);cursor:pointer}
+input.f,select.f{width:100%;min-height:46px;border:1.5px solid var(--chip);border-radius:12px;padding:0 12px;background:#fff;font-size:15px}
+label.fl{display:block;font-size:13px;font-weight:700;color:var(--muted);margin:0 0 5px}
+.seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.seg button{min-height:42px;border-radius:12px;border:1.5px solid var(--chip);background:#fff;font-size:14px;cursor:pointer}
+.seg button.on{background:var(--plum);color:#fff;border-color:var(--plum);font-weight:700}
+nav.bot{position:fixed;left:0;right:0;bottom:0;height:calc(var(--nav-h) + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);background:#fff;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,minmax(0,1fr));z-index:20}
+nav.bot button{border:0;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:12px;color:var(--muted);cursor:pointer}
+nav.bot button.on{color:var(--plum);font-weight:700}
+nav.bot svg{width:24px;height:24px}
+.sheet{position:fixed;inset:0;background:rgba(42,26,34,.45);z-index:60;display:none;align-items:flex-end;justify-content:center}
+.sheet.on{display:flex}
+.sheet .box{background:var(--bg);width:100%;max-width:560px;max-height:92vh;overflow-y:auto;border-radius:22px 22px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom))}
+.toast{position:fixed;left:50%;bottom:calc(var(--nav-h) + 16px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;z-index:80;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90vw;text-align:center}
+.toast.on{opacity:1}
+.stars{color:var(--gold);letter-spacing:1px}
+.avatar{width:44px;height:44px;border-radius:50%;background:var(--plum);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;flex:none}
+</style>
+</head>
+<body>
+<div id="ver" class="num">v0.1</div>
+<header class="top"><div class="logo">CREMOSA</div></header>
+
+<main id="main">
+<!-- INÍCIO -->
+<section class="page on" id="p-inicio">
+  <p class="sub">Vamos descobrir o creme certo para o seu cabelo.</p>
+  <div class="stack">
+    <div class="photo" id="hairPhoto">
+      <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#7A2E62" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+      <div style="font-weight:700">Tire uma foto do seu cabelo</div>
+      <button class="btn pri sm" id="btnHairCam">Abrir câmara</button>
+    </div>
+    <div>
+      <div class="lbl">Como está o seu cabelo?</div>
+      <p class="small" style="margin:4px 0 10px">Marque tudo o que vê na foto.</p>
+      <div class="chips" id="chips"></div>
+    </div>
+    <button class="btn dark full" id="btnRec">Ver o creme ideal</button>
+    <div class="stack" id="recs"></div>
+  </div>
+</section>
+
+<!-- ESTANTE -->
+<section class="page" id="p-estante">
+  <div class="row" style="align-items:flex-end;margin-bottom:12px">
+    <div class="grow">
+      <h2 class="title">Minha estante</h2>
+      <div class="small num" id="shelfSum">0 cremes</div>
+    </div>
+    <button class="btn pri" id="btnAdd" aria-label="Adicionar creme" style="width:52px;padding:0"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+  </div>
+  <div class="filters" id="shelfFilters"></div>
+  <div class="grid2" id="shelf"></div>
+</section>
+
+<!-- MERCADO -->
+<section class="page" id="p-mercado">
+  <h2 class="title">Mercado</h2>
+  <p class="sub">Cremes para trocar ou vender</p>
+  <div class="stack">
+    <div class="card row">
+      <div class="avatar" id="meAv">E</div>
+      <div class="grow">
+        <input class="f" id="meName" placeholder="O seu nome no mercado" maxlength="30" style="min-height:40px;font-weight:700">
+        <div class="small"><span class="stars">☆☆☆☆☆</span> ainda sem avaliações</div>
+      </div>
+    </div>
+    <div class="banner">Nesta versão vê os seus anúncios. Para ver os cremes de outras mulheres e negociar, a app precisa de um servidor (próxima versão).</div>
+    <div class="lbl">Meus anúncios</div>
+    <div class="stack" id="ads"></div>
+    <button class="btn dark full" id="btnPublish">Publicar um creme da minha estante</button>
+  </div>
+</section>
+
+<!-- COMPRAR -->
+<section class="page" id="p-comprar">
+  <h2 class="title">Onde comprar</h2>
+  <div class="stack" style="margin-top:8px">
+    <div>
+      <label class="fl" for="prod">Creme que procura</label>
+      <input class="f" id="prod" placeholder="Ex.: máscara de hidratação" autocomplete="off">
+    </div>
+    <div id="map"></div>
+    <div class="row">
+      <button class="btn out sm grow" id="btnGps">Minha localização</button>
+      <button class="btn out sm grow" id="btnShops">Procurar lojas perto</button>
+    </div>
+    <div class="card" id="shops"><div class="small">Toque em "Procurar lojas perto" para ver lojas de cosméticos no mapa.</div></div>
+
+    <div class="lbl">Comparar preços</div>
+    <div class="row">
+      <button class="btn dark sm grow" id="btnAli">Ver no AliExpress</button>
+      <button class="btn dark sm grow" id="btnShein">Ver na Shein</button>
+    </div>
+    <p class="small" style="margin:0">Anote o preço que encontrou em cada loja. A app mostra qual é o melhor.</p>
+    <div class="stack" id="prices"></div>
+    <div class="card stack">
+      <div class="row">
+        <input class="f grow" id="pStore" placeholder="Loja (ex.: AliExpress)">
+        <input class="f num" id="pVal" inputmode="numeric" placeholder="Kz" style="width:110px;flex:none">
+      </div>
+      <button class="btn pri full" id="btnPrice">Adicionar preço</button>
+    </div>
+  </div>
+</section>
+</main>
+
+<nav class="bot" id="nav">
+  <button data-p="inicio" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9H3z"/></svg>Início</button>
+  <button data-p="estante"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16M20 4v16M4 10h16M4 16h16"/></svg>Estante</button>
+  <button data-p="mercado"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h13l-3-3M17 17H4l3 3"/></svg>Mercado</button>
+  <button data-p="comprar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Comprar</button>
+</nav>
+
+<!-- Sheet: adicionar / editar creme -->
+<div class="sheet" id="sheet">
+  <div class="box">
+    <div class="row" style="margin-bottom:12px">
+      <h3 class="grow" style="font-size:19px" id="sheetTitle">Novo creme</h3>
+      <button class="x" id="sheetClose" aria-label="Fechar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="stack">
+      <div class="photo" id="cPhoto" style="height:170px">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#7A2E62" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+        <button class="btn pri sm" id="btnCreamCam">Fotografar creme</button>
+      </div>
+      <div><label class="fl" for="cName">Nome</label><input class="f" id="cName" placeholder="Ex.: Creme de pentear"></div>
+      <div><label class="fl" for="cBrand">Marca</label><input class="f" id="cBrand" placeholder="Marca"></div>
+      <div><label class="fl" for="cType">Tipo</label><select class="f" id="cType"></select></div>
+      <div><label class="fl" for="cPrice">Quanto pagou (Kz)</label><input class="f num" id="cPrice" inputmode="numeric" placeholder="0"></div>
+      <div><label class="fl">Estado</label><div class="seg" id="cState"><button data-v="uso" class="on">Em uso</button><button data-v="venda">À venda</button><button data-v="troca">Troca</button></div></div>
+      <div id="sellBox" style="display:none"><label class="fl" for="cSell">Preço de venda (Kz)</label><input class="f num" id="cSell" inputmode="numeric" placeholder="0"></div>
+      <button class="btn pri full" id="btnSave">Guardar na estante</button>
+      <button class="btn out full" id="btnDel" style="display:none;border-color:#B3261E;color:#B3261E">Apagar creme</button>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="fileHair" accept="image/*" capture="environment" hidden>
+<input type="file" id="fileCream" accept="image/*" capture="environment" hidden>
+<div class="toast" id="toast"></div>
+
+<script>/*LEAFLET_JS*/</script>
+<script>
+(function(){
+'use strict';
+var $=function(id){return document.getElementById(id)};
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function kz(n){n=Math.round(Number(n)||0);return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.')+' Kz'}
+function num(v){return Number(String(v||'').replace(/[^\d]/g,''))||0}
+var store={get:function(k,d){try{var v=localStorage.getItem('cremosa.'+k);return v?JSON.parse(v):d}catch(e){return d}},
+  set:function(k,v){try{localStorage.setItem('cremosa.'+k,JSON.stringify(v));return true}catch(e){toast('Sem espaço para guardar. Apague alguma foto.');return false}}};
+var tt;function toast(m){var t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(function(){t.classList.remove('on')},2400)}
+
+/* ---------- navegação ---------- */
+var mapReady=false;
+function go(p){
+  document.querySelectorAll('.page').forEach(function(s){s.classList.toggle('on',s.id==='p-'+p)});
+  document.querySelectorAll('#nav button').forEach(function(b){b.classList.toggle('on',b.dataset.p===p)});
+  $('main').scrollTop=0;
+  if(p==='comprar'){initMap();setTimeout(function(){map&&map.invalidateSize()},60)}
+  if(p==='mercado')renderAds();
+  if(p==='estante')renderShelf();
+}
+document.querySelectorAll('#nav button').forEach(function(b){b.onclick=function(){go(b.dataset.p)}});
+
+/* ---------- fotos (comprimidas) ---------- */
+function readPhoto(file,max,cb){
+  if(!file)return;
+  var r=new FileReader();
+  r.onload=function(){var img=new Image();img.onload=function(){
+    var s=Math.min(1,max/Math.max(img.width,img.height));var c=document.createElement('canvas');
+    c.width=Math.round(img.width*s);c.height=Math.round(img.height*s);c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+    cb(c.toDataURL('image/jpeg',.72))};img.onerror=function(){toast('Não foi possível abrir a foto')};img.src=r.result};
+  r.readAsDataURL(file);
+}
+function showPhoto(box,data,btnId,label){
+  var old=box.querySelector('img');if(old)old.remove();
+  if(!data)return;
+  var img=document.createElement('img');img.src=data;img.alt='';box.appendChild(img);
+  var b=$(btnId);b.classList.add('again');b.textContent=label;box.appendChild(b);
+}
+
+/* ---------- INÍCIO: diagnóstico ---------- */
+var FEATS=['Ressecado','Frizz','Quebradiço','Oleoso','Sem brilho','Pontas duplas','Liso','Ondulado','Cacheado','Crespo','Com química','Queda'];
+var TYPES={
+  hidra:{n:'Máscara de hidratação',a:'pantenol, glicerina, aloe vera',c:'#4F8FC0'},
+  nutri:{n:'Creme nutritivo / manteiga',a:'karité, óleo de coco, argan',c:'#D98E3F'},
+  recon:{n:'Máscara de reconstrução',a:'queratina, aminoácidos, colágeno',c:'#7A2E62'},
+  pentear:{n:'Creme de pentear / leave-in',a:'óleos leves, silicone solúvel',c:'#6FA38B'},
+  ativador:{n:'Ativador de cachos',a:'polímeros de fixação, glicerina',c:'#B5658F'},
+  antifrizz:{n:'Creme anti-frizz',a:'óleo de argan, silicone leve',c:'#C9A27A'},
+  leve:{n:'Creme leve sem óleo',a:'fórmula leve, sem manteigas',c:'#8FB6C9'},
+  fortal:{n:'Creme fortalecedor antiqueda',a:'biotina, cafeína, pantenol',c:'#9C6B4E'},
+  outro:{n:'Outro',a:'',c:'#A89AA2'}
+};
+var RULES={
+  'Ressecado':['hidra','nutri'],'Sem brilho':['hidra','nutri'],'Frizz':['antifrizz','nutri'],
+  'Quebradiço':['recon'],'Pontas duplas':['recon','nutri'],'Com química':['recon','hidra'],
+  'Oleoso':['leve'],'Cacheado':['ativador','pentear'],'Ondulado':['ativador','pentear'],
+  'Crespo':['nutri','pentear'],'Liso':['pentear'],'Queda':['fortal']
+};
+var why={hidra:'repõe a água do fio',nutri:'repõe os óleos e sela a humidade',recon:'repara a fibra danificada',pentear:'desembaraça e protege no dia a dia',ativador:'define os cachos',antifrizz:'controla o frizz',leve:'trata sem pesar nem engordurar',fortal:'fortalece a raiz'};
+var sel=store.get('feats',[]);
+function renderChips(){
+  $('chips').innerHTML=FEATS.map(function(f){return '<button class="chip'+(sel.indexOf(f)>=0?' on':'')+'" data-f="'+f+'">'+f+'</button>'}).join('');
+  $('chips').querySelectorAll('.chip').forEach(function(b){b.onclick=function(){
+    var f=b.dataset.f,i=sel.indexOf(f);if(i>=0)sel.splice(i,1);else sel.push(f);
+    b.classList.toggle('on',i<0);store.set('feats',sel)}});
+}
+function recommend(){
+  if(!sel.length){toast('Marque pelo menos uma característica');return}
+  var score={};sel.forEach(function(f){(RULES[f]||[]).forEach(function(t,i){score[t]=(score[t]||0)+(i===0?2:1)})});
+  if(sel.indexOf('Oleoso')>=0){delete score.nutri}
+  var top=Object.keys(score).sort(function(a,b){return score[b]-score[a]}).slice(0,3);
+  var html=top.map(function(k,i){var t=TYPES[k];return '<div class="card rec">'+
+    '<div class="tube" style="background:'+t.c+'"></div><div class="grow">'+
+    (i===0?'<div class="tag best" style="margin-bottom:6px">RECOMENDADO PARA SI</div>':'')+
+    '<div style="font-weight:700;font-size:16px">'+t.n+'</div>'+
+    '<div class="small">Porque '+why[k]+'. Procure: '+t.a+'.</div>'+
+    '<button class="btn out sm" style="margin-top:10px" data-buy="'+esc(t.n)+'">Onde comprar</button></div></div>'}).join('');
+  if(sel.indexOf('Queda')>=0)html+='<div class="banner">Se a queda for forte ou durar semanas, consulte um dermatologista.</div>';
+  $('recs').innerHTML=html;
+  $('recs').querySelectorAll('[data-buy]').forEach(function(b){b.onclick=function(){$('prod').value=b.dataset.buy;go('comprar');renderPrices()}});
+  store.set('lastRec',top);
+}
+$('btnHairCam').onclick=function(){$('fileHair').click()};
+$('fileHair').onchange=function(e){readPhoto(e.target.files[0],900,function(d){store.set('hairPhoto',d);showPhoto($('hairPhoto'),d,'btnHairCam','Nova foto')});e.target.value=''};
+$('btnRec').onclick=recommend;
+
+/* ---------- ESTANTE ---------- */
+var creams=store.get('creams',[]);var filt='todos';var editing=null;var cState='uso';var cPhotoData=null;
+$('cType').innerHTML=Object.keys(TYPES).map(function(k){return '<option value="'+k+'">'+TYPES[k].n+'</option>'}).join('');
+var STATE_LBL={uso:'EM USO',venda:'À VENDA',troca:'TROCA'};
+function renderFilters(){
+  var f=[['todos','Todos'],['uso','Em uso'],['venda','À venda'],['troca','Troca']];
+  $('shelfFilters').innerHTML=f.map(function(x){return '<button class="chip'+(filt===x[0]?' on':'')+'" data-v="'+x[0]+'">'+x[1]+'</button>'}).join('');
+  $('shelfFilters').querySelectorAll('button').forEach(function(b){b.onclick=function(){filt=b.dataset.v;renderShelf()}});
+}
+function renderShelf(){
+  renderFilters();
+  var total=creams.reduce(function(s,c){return s+(c.price||0)},0);
+  $('shelfSum').textContent=creams.length+(creams.length===1?' creme':' cremes')+' · total gasto '+kz(total);
+  var list=creams.filter(function(c){return filt==='todos'||c.state===filt});
+  if(!list.length){$('shelf').innerHTML='<div class="empty" style="grid-column:1/-1">'+(creams.length?'Nada aqui.':'A sua estante está vazia.<br>Toque em + para fotografar o primeiro creme.')+'</div>';return}
+  $('shelf').innerHTML=list.map(function(c){var t=TYPES[c.type]||TYPES.outro;return '<button class="item" data-id="'+c.id+'">'+
+    '<div class="ph">'+(c.photo?'<img src="'+c.photo+'" alt="">':'<div class="tube" style="background:'+t.c+'"></div>')+'</div>'+
+    '<div class="nm">'+esc(c.name||t.n)+'</div><div class="small" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(c.brand||'—')+'</div>'+
+    '<div class="row" style="justify-content:space-between"><span class="num" style="font-weight:700;font-size:14px">'+kz(c.price)+'</span><span class="tag '+c.state+'">'+STATE_LBL[c.state]+'</span></div></button>'}).join('');
+  $('shelf').querySelectorAll('.item').forEach(function(b){b.onclick=function(){openSheet(b.dataset.id)}});
+}
+function setState(v){cState=v;$('cState').querySelectorAll('button').forEach(function(b){b.classList.toggle('on',b.dataset.v===v)});$('sellBox').style.display=v==='venda'?'block':'none'}
+$('cState').querySelectorAll('button').forEach(function(b){b.onclick=function(){setState(b.dataset.v)}});
+function resetPhotoBox(){var box=$('cPhoto');var img=box.querySelector('img');if(img)img.remove();var b=$('btnCreamCam');b.classList.remove('again');b.textContent='Fotografar creme'}
+function openSheet(id,presetState){
+  editing=id?creams.find(function(c){return c.id===id}):null;
+  resetPhotoBox();cPhotoData=editing?editing.photo:null;
+  if(cPhotoData)showPhoto($('cPhoto'),cPhotoData,'btnCreamCam','Nova foto');
+  $('sheetTitle').textContent=editing?'Editar creme':'Novo creme';
+  $('cName').value=editing?editing.name:'';$('cBrand').value=editing?editing.brand:'';
+  $('cType').value=editing?editing.type:'hidra';$('cPrice').value=editing&&editing.price?editing.price:'';
+  $('cSell').value=editing&&editing.sell?editing.sell:'';
+  setState(editing?editing.state:(presetState||'uso'));
+  $('btnDel').style.display=editing?'flex':'none';
+  $('sheet').classList.add('on');
+}
+function closeSheet(){$('sheet').classList.remove('on')}
+$('btnAdd').onclick=function(){openSheet(null)};
+$('sheetClose').onclick=closeSheet;
+$('sheet').onclick=function(e){if(e.target===$('sheet'))closeSheet()};
+$('btnCreamCam').onclick=function(){$('fileCream').click()};
+$('fileCream').onchange=function(e){readPhoto(e.target.files[0],480,function(d){cPhotoData=d;showPhoto($('cPhoto'),d,'btnCreamCam','Nova foto')});e.target.value=''};
+$('btnSave').onclick=function(){
+  var name=$('cName').value.trim();
+  if(!name&&!cPhotoData){toast('Escreva o nome ou tire uma foto');return}
+  var c=editing||{id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),created:Date.now()};
+  c.name=name;c.brand=$('cBrand').value.trim();c.type=$('cType').value;c.price=num($('cPrice').value);
+  c.state=cState;c.sell=cState==='venda'?num($('cSell').value):0;c.photo=cPhotoData;
+  if(!editing)creams.unshift(c);
+  if(store.set('creams',creams)){closeSheet();renderShelf();renderAds();toast('Guardado')}
+};
+var delArm=0;
+$('btnDel').onclick=function(){if(!editing)return;
+  if(Date.now()-delArm>3000){delArm=Date.now();$('btnDel').textContent='Toque de novo para apagar';setTimeout(function(){$('btnDel').textContent='Apagar creme'},3000);return}
+  delArm=0;$('btnDel').textContent='Apagar creme';
+  creams=creams.filter(function(c){return c!==editing});store.set('creams',creams);closeSheet();renderShelf();renderAds();toast('Apagado')};
+
+/* ---------- MERCADO ---------- */
+var me=store.get('me',{name:'Eu'});
+function renderMe(){$('meName').value=me.name==='Eu'?'':me.name;$('meAv').textContent=(me.name||'E').trim().charAt(0).toUpperCase()||'E'}
+$('meName').addEventListener('change',function(){var n=$('meName').value.trim().slice(0,30);me.name=n||'Eu';store.set('me',me);$('meAv').textContent=(n||'E').charAt(0).toUpperCase()});
+function renderAds(){
+  var ads=creams.filter(function(c){return c.state==='venda'||c.state==='troca'});
+  if(!ads.length){$('ads').innerHTML='<div class="empty">Ainda não tem cremes à venda ou para troca.</div>';return}
+  $('ads').innerHTML=ads.map(function(c){var t=TYPES[c.type]||TYPES.outro;return '<div class="card row" data-id="'+c.id+'" style="cursor:pointer">'+
+    '<div style="width:64px;height:72px;border-radius:12px;background:var(--soft);overflow:hidden;flex:none;display:flex;align-items:center;justify-content:center">'+(c.photo?'<img src="'+c.photo+'" alt="" style="width:100%;height:100%;object-fit:cover">':'<div class="tube" style="background:'+t.c+';width:34px;height:50px"></div>')+'</div>'+
+    '<div class="grow"><div style="font-weight:700">'+esc(c.name||t.n)+'</div><div class="small">'+esc(c.brand||'—')+'</div>'+
+    (c.state==='venda'?'<div class="num" style="font-weight:700;color:var(--plum);font-size:16px">'+kz(c.sell)+'</div>':'<div class="tag troca">SÓ TROCA</div>')+'</div></div>'}).join('');
+  $('ads').querySelectorAll('[data-id]').forEach(function(d){d.onclick=function(){openSheet(d.dataset.id)}});
+}
+$('btnPublish').onclick=function(){
+  var own=creams.filter(function(c){return c.state==='uso'});
+  if(!creams.length){toast('Primeiro adicione cremes na estante');go('estante');return}
+  toast('Escolha o creme e mude o estado para "À venda" ou "Troca"');go('estante');
+};
+
+/* ---------- COMPRAR ---------- */
+var map=null,meMk=null,shopLayer=null,pos=store.get('pos',[-8.8383,13.2344]);
+function initMap(){
+  if(map||typeof L==='undefined')return;
+  map=L.map('map',{zoomControl:true,attributionControl:true}).setView(pos,13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
+  shopLayer=L.layerGroup().addTo(map);
+}
+function setMe(p){pos=p;store.set('pos',p);if(!map)return;if(meMk)meMk.setLatLng(p);else meMk=L.circleMarker(p,{radius:9,color:'#fff',weight:3,fillColor:'#2F6FD6',fillOpacity:1}).addTo(map);map.setView(p,14)}
+function gps(cb){
+  if(!navigator.geolocation){toast('GPS não disponível');return}
+  toast('A procurar a sua localização…');
+  navigator.geolocation.getCurrentPosition(function(p){setMe([p.coords.latitude,p.coords.longitude]);cb&&cb()},
+    function(){toast('Ative o GPS e dê permissão de localização')},{enableHighAccuracy:true,timeout:15000,maximumAge:60000});
+}
+function dist(a,b){var R=6371,r=Math.PI/180,dl=(b[0]-a[0])*r,dn=(b[1]-a[1])*r,x=Math.sin(dl/2)*Math.sin(dl/2)+Math.cos(a[0]*r)*Math.cos(b[0]*r)*Math.sin(dn/2)*Math.sin(dn/2);return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))}
+function findShops(){
+  initMap();
+  $('shops').innerHTML='<div class="small">A procurar lojas…</div>';
+  var q='[out:json][timeout:25];(nwr["shop"~"cosmetics|beauty|chemist|hairdresser_supply|perfumery"](around:6000,'+pos[0]+','+pos[1]+'););out center 40;';
+  fetch('https://overpass-api.de/api/interpreter',{method:'POST',body:'data='+encodeURIComponent(q),headers:{'Content-Type':'application/x-www-form-urlencoded'}})
+  .then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(j){
+    var list=(j.elements||[]).map(function(e){var la=e.lat||(e.center&&e.center.lat),lo=e.lon||(e.center&&e.center.lon);
+      return {n:(e.tags&&(e.tags.name||e.tags.brand))||'Loja de cosméticos',p:[la,lo],d:dist(pos,[la,lo])}}).filter(function(s){return s.p[0]});
+    list.sort(function(a,b){return a.d-b.d});list=list.slice(0,15);
+    shopLayer.clearLayers();
+    if(!list.length){$('shops').innerHTML='<div class="small">Não encontrei lojas registadas no mapa num raio de 6 km.</div>';return}
+    list.forEach(function(s){L.circleMarker(s.p,{radius:8,color:'#fff',weight:2,fillColor:'#7A2E62',fillOpacity:1}).bindPopup(esc(s.n)).addTo(shopLayer)});
+    $('shops').innerHTML=list.map(function(s,i){return '<div class="shop"><div class="grow"><div style="font-weight:700">'+esc(s.n)+'</div><div class="small num">'+s.d.toFixed(1).replace('.',',')+' km</div></div>'+
+      '<a class="btn out sm" href="https://www.google.com/maps/dir/?api=1&destination='+s.p[0]+','+s.p[1]+'" target="_blank" rel="noopener">Ir</a></div>'}).join('');
+  }).catch(function(){$('shops').innerHTML='<div class="small">Sem ligação ao serviço de mapas. Tente de novo.</div>'});
+}
+$('btnGps').onclick=function(){initMap();gps()};
+$('btnShops').onclick=function(){initMap();if(!meMk&&navigator.geolocation)gps(findShops);else findShops()};
+function q(){return ($('prod').value.trim()||'creme de cabelo')}
+function openExt(u){var a=document.createElement('a');a.href=u;a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove()}
+$('btnAli').onclick=function(){openExt('https://www.aliexpress.com/w/wholesale-'+encodeURIComponent(q().replace(/\s+/g,'-'))+'.html')};
+$('btnShein').onclick=function(){openExt('https://m.shein.com/pt/pdsearch/'+encodeURIComponent(q())+'/')};
+var prices=store.get('prices',{});
+function pkey(){return q().toLowerCase()}
+function renderPrices(){
+  var list=(prices[pkey()]||[]).slice();
+  if(!list.length){$('prices').innerHTML='';return}
+  var min=Math.min.apply(null,list.map(function(x){return x.v}));
+  $('prices').innerHTML=list.map(function(x,i){var b=x.v===min&&list.length>1;return '<div class="pr'+(b?' best':'')+'"><div class="grow"><div style="font-weight:700">'+esc(x.s)+'</div>'+(b?'<span class="tag best">MELHOR PREÇO</span>':'')+'</div>'+
+    '<div class="price num">'+kz(x.v)+'</div><button class="x" data-i="'+i+'" aria-label="Apagar preço"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>'}).join('');
+  $('prices').querySelectorAll('.x').forEach(function(b){b.onclick=function(){prices[pkey()].splice(+b.dataset.i,1);store.set('prices',prices);renderPrices()}});
+}
+$('btnPrice').onclick=function(){var s=$('pStore').value.trim(),v=num($('pVal').value);
+  if(!s||!v){toast('Escreva a loja e o preço');return}
+  (prices[pkey()]=prices[pkey()]||[]).push({s:s.slice(0,40),v:v});store.set('prices',prices);
+  $('pStore').value='';$('pVal').value='';renderPrices()};
+$('prod').addEventListener('input',renderPrices);
+
+/* ---------- arranque ---------- */
+renderChips();renderMe();renderShelf();
+var hp=store.get('hairPhoto',null);if(hp)showPhoto($('hairPhoto'),hp,'btnHairCam','Nova foto');
+if(sel.length&&store.get('lastRec',null))recommend();
+window.addEventListener('popstate',function(){});
+document.addEventListener('backbutton',function(){});
+window.cremosaBack=function(){if($('sheet').classList.contains('on')){closeSheet();return true}
+  if(!$('p-inicio').classList.contains('on')){go('inicio');return true}return false};
+})();
+</script>
+</body>
+</html>

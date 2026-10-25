@@ -1,0 +1,36 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'ao.patron.cremosa'
+    compileSdk 36
+    defaultConfig {
+        applicationId 'ao.patron.cremosa'
+        minSdk 24
+        targetSdk 36
+        versionCode Integer.parseInt(System.getenv('VERSION_CODE') ?: '1')
+        versionName '0.1'
+    }
+    signingConfigs {
+        release {
+            storeFile file('release.jks')
+            storePassword 'cremosa2026'
+            keyAlias 'cremosa'
+            keyPassword 'cremosa2026'
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'androidx.webkit:webkit:1.12.1'
+    implementation 'androidx.core:core:1.13.1'
+}

@@ -1,0 +1,10 @@
+<resources>
+    <style name="Cremosa" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/fundo</item>
+        <item name="android:statusBarColor">@color/fundo</item>
+        <item name="android:navigationBarColor">#FFFFFF</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:colorAccent">#7A2E62</item>
+    </style>
+    <color name="fundo">#FBF4EE</color>
+</resources>
